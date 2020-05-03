@@ -8,10 +8,13 @@ pub fn find_first_port(ports: Vec<&str>, host: &str) -> String {
         let listener = TcpListener::bind(&address);
 
         match listener {
-            Ok(l) => result = l.local_addr().unwrap().port().to_string(),
+            Ok(l) => {
+                result = l.local_addr().unwrap().port().to_string();
+                break;
+            }
             Err(e) => {
                 if i == ports.len() - 1 {
-                    result = format!("Could not create TCP listener on {}: {}", address, e)
+                    result = format!("Could not create TCP listener on {}: {}", address, e);
                 } else {
                     continue;
                 }
