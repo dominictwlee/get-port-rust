@@ -1,9 +1,11 @@
+use std::io::{Error, ErrorKind};
 use std::net::TcpListener;
 
-pub fn find_first_port(ports: Vec<&str>, host: &str) -> String {
+pub fn find_first_port(ports: Vec<&str>, host: &str) -> Result<String, Error> {
     let mut result = String::new();
+    let mut err = Error::new(ErrorKind::Other, "Could not find any open ports");
 
-    for (i, p) in ports.iter().enumerate() {
+    for p in ports.iter() {
         let address = format!("{}:{}", host, p);
         let listener = TcpListener::bind(&address);
 
@@ -13,14 +15,14 @@ pub fn find_first_port(ports: Vec<&str>, host: &str) -> String {
                 break;
             }
             Err(e) => {
-                if i == ports.len() - 1 {
-                    result = format!("Could not create TCP listener on {}: {}", address, e);
-                } else {
-                    continue;
-                }
+                err = e;
             }
         };
     }
 
-    return result;
+    if result.is_empty() {
+        Err(err)
+    } else {
+        Ok(result)
+    }
 }

@@ -12,6 +12,7 @@ fn main() {
         .arg(
             Arg::with_name("ports")
                 .min_values(1)
+                .index(1)
                 .default_values(&["0"])
                 .about("Preferred ports"),
         )
@@ -28,7 +29,8 @@ fn main() {
     let preferred_ports: Vec<&str> = matches.values_of("ports").unwrap().collect();
     let host = matches.value_of("host").unwrap();
 
-    let result = find_first_port(preferred_ports, host);
-
-    println!("{}", result);
+    match find_first_port(preferred_ports, host) {
+        Ok(p) => println!("{}", p),
+        Err(e) => println!("Failed to find an open port: {}", e),
+    }
 }
